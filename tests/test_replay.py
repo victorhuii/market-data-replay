@@ -18,8 +18,9 @@ class ReplayTests(unittest.TestCase):
     def setUpClass(cls):
         flags=['-std=c++20','-O1','-g','-Wall','-Wextra','-Werror']
         if 'sanitize' in str(BINARY):flags+=['-fsanitize=address,undefined','-fno-omit-frame-pointer']
-        subprocess.run(['c++',*flags,'tests/atomic.cpp','-o','build/atomic'],cwd=ROOT,check=True,capture_output=True)
-        subprocess.run(['c++',*flags,'tests/allocation.cpp','-o','build/allocation'],cwd=ROOT,check=True,capture_output=True)
+        for helper in ('atomic','allocation'):
+            result=subprocess.run(['c++',*flags,f'tests/{helper}.cpp','-o',f'build/{helper}'],cwd=ROOT,capture_output=True,text=True)
+            if result.returncode:raise RuntimeError(result.stderr)
 
     def setUp(self):self.temp=tempfile.TemporaryDirectory();self.root=Path(self.temp.name)
     def tearDown(self):self.temp.cleanup()
