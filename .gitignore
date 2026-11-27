@@ -3,3 +3,6 @@ runtime/
 __pycache__/
 *.pyc
 .DS_Store
+
+# Generated public demo output
+/site/

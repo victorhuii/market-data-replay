@@ -1,0 +1,32 @@
+{
+  "repo": "market-data-replay",
+  "title": "Market Data Replay",
+  "summary": "Bounded ITCH-subset decoding and MoldUDP64 replay with sequence checks, overlapping retransmissions, and atomic packet recovery.",
+  "image": "docs/assets/replay-benchmark.png",
+  "image_kind": "Generated benchmark figure",
+  "architecture": "docs/ARCHITECTURE.md",
+  "portfolio": "docs/PORTFOLIO.md",
+  "ownership": "Original implementation",
+  "evidence": "Independent book reference, sanitizer checks, and allocation-failure rollback evidence.",
+  "limitation": "No live feed, PCAP parser or retransmission requester; checksum is not authentication.",
+  "output": "site",
+  "deployment_doc": "docs/DEPLOYMENT.md",
+  "decisions_doc": "docs/DECISIONS.md",
+  "decisions": [
+    [
+      "Explicit supported-message subset",
+      "Keep binary contracts and failure behavior reviewable.",
+      "Arbitrary full feeds with unsupported types fail closed."
+    ],
+    [
+      "Touched-node rollback journal",
+      "Retain original map nodes until packet commit and restore them without allocation after failure.",
+      "Per-packet bookkeeping and active-locate scans still cost time."
+    ],
+    [
+      "Independent Python reference and frozen captures",
+      "Compare complete final orders and identities across implementations.",
+      "Synthetic captures do not establish live multicast correctness."
+    ]
+  ]
+}
