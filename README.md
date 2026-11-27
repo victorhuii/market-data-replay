@@ -1,5 +1,9 @@
 # Market Data Replay
 
+<!-- project-navigation:start -->
+[Architecture](docs/ARCHITECTURE.md) · [Design choices](docs/DECISIONS.md) · [Portfolio](docs/PORTFOLIO.md)
+<!-- project-navigation:end -->
+
 A C++20 replay engine for a documented subset of Nasdaq ITCH 5.0 messages inside MoldUDP64 datagrams. It reconstructs visible orders, detects missing sequences, handles overlapping retransmissions, and saves validated restart checkpoints.
 
 This is an original implementation with an independent Python reference. Fixtures are owned synthetic data, not licensed Nasdaq captures. The supported subset is intentionally narrow; an arbitrary full production feed contains unsupported message types and will be rejected.
