@@ -44,6 +44,11 @@ class ReplayTests(unittest.TestCase):
         chk=self.root/'state.chk';self.run_capture(packets[:1],'--save',chk)
         resumed=self.run_capture(packets[1:],'--load',chk);self.assertEqual(resumed['state_fnv64'],whole['state_fnv64']);self.assertEqual(resumed['new_messages'],2)
 
+    def test_completed_capture_checkpoint_is_idempotent(self):
+        packets=workload(200,30,17);chk=self.root/"complete.chk"
+        first=self.run_capture(packets,"--save",chk);second=self.run_capture(packets,"--load",chk)
+        self.assertEqual(first["state_fnv64"],second["state_fnv64"]);self.assertEqual(second["new_messages"],0)
+
     def test_gap_session_switch_and_ended_session(self):
         for packets in ([packet(1,[add(1)]),packet(3,[add(2)])],[packet(1,[add(1)]),packet(2,[add(2)],session=b'OTHER00001')],[packet(1,count=65535),packet(1,[add(1)])]):self.run_capture(packets,success=False)
         actual=self.run_capture([packet(1),packet(1,[add(1)]),packet(2),packet(2,count=65535)]);self.assertTrue(actual['ended']);self.assertEqual(actual['next_sequence'],2)

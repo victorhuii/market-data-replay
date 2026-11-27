@@ -59,7 +59,7 @@ struct State {
         require(packet.size()>=20 && packet.size()<=65507,"invalid MoldUDP64 datagram size");auto incoming=text(packet.first(10));require(printable(incoming),"invalid session bytes");auto sequence=be(packet,10,8),count=be(packet,18,2);require(sequence>0,"zero sequence");
         require(session.empty() || incoming==session,"session mismatch");
         if(count==0 || count==65535){
-            require(packet.size()==20,"control packet trailing bytes");require(sequence==next,"control sequence mismatch");require(!ended,"session ended");State staged=*this;staged.session=incoming;staged.ended=count==65535;*this=std::move(staged);return 0;
+            require(packet.size()==20,"control packet trailing bytes");require(sequence==next,"control sequence mismatch");if(ended && count==65535)return 0;require(!ended,"session ended");State staged=*this;staged.session=incoming;staged.ended=count==65535;*this=std::move(staged);return 0;
         }
         require(sequence<=std::numeric_limits<uint64_t>::max()-count,"sequence overflow");auto end_sequence=sequence+count;
         std::vector<Bytes> events;events.reserve(static_cast<size_t>(count));size_t offset=20;
@@ -73,7 +73,10 @@ struct State {
     }
     std::string body()const{
         std::ostringstream out;out<<"MDR1\n"<<hextext(session)<<' '<<next<<' '<<ended<<' '<<max_timestamp<<' '<<orders.size()<<'\n';
-        for(const auto& [id,o]:orders)out<<id<<' '<<o.locate<<' '<<o.side<<' '<<o.quantity<<' '<<o.price<<' '<<hextext(o.stock)<<' '<<hextext(o.mpid)<<'\n';return out.str();
+        for(const auto& [id,o]:orders){
+            out<<id<<' '<<o.locate<<' '<<o.side<<' '<<o.quantity<<' '<<o.price<<' '<<hextext(o.stock)<<' '<<hextext(o.mpid)<<'\n';
+        }
+        return out.str();
     }
     std::string checkpoint()const{require(session.size()==10,"checkpoint requires an initialized session");auto data=body();return data+std::to_string(fnv(data))+"\n";}
     static State restore(const std::string& serialized){
