@@ -19,6 +19,7 @@ class ReplayTests(unittest.TestCase):
         flags=['-std=c++20','-O1','-g','-Wall','-Wextra','-Werror']
         if 'sanitize' in str(BINARY):flags+=['-fsanitize=address,undefined','-fno-omit-frame-pointer']
         subprocess.run(['c++',*flags,'tests/atomic.cpp','-o','build/atomic'],cwd=ROOT,check=True,capture_output=True)
+        subprocess.run(['c++',*flags,'tests/allocation.cpp','-o','build/allocation'],cwd=ROOT,check=True,capture_output=True)
 
     def setUp(self):self.temp=tempfile.TemporaryDirectory();self.root=Path(self.temp.name)
     def tearDown(self):self.temp.cleanup()
@@ -43,6 +44,11 @@ class ReplayTests(unittest.TestCase):
         whole=self.run_capture(packets);self.assertEqual(whole['new_messages'],5);self.assertEqual(whole['orders'],decode(packets)['orders'])
         chk=self.root/'state.chk';self.run_capture(packets[:1],'--save',chk)
         resumed=self.run_capture(packets[1:],'--load',chk);self.assertEqual(resumed['state_fnv64'],whole['state_fnv64']);self.assertEqual(resumed['new_messages'],2)
+
+    def test_allocation_failure_rollback_across_delete_replace_and_reuse(self):
+        packets=[packet(1,[add(1),add(2)]),packet(3,[replace(1,3),reduce('E',3,5),reduce('D',3),add(3),reduce('D',2),add(4)])]
+        r=subprocess.run([str(ROOT/'build/allocation')],input=capture(self.root/'allocation.mdr',packets).read_bytes(),capture_output=True,timeout=30)
+        self.assertEqual(r.returncode,0,r.stderr);self.assertIn(b'failure points preserved state',r.stdout)
 
     def test_completed_capture_checkpoint_is_idempotent(self):
         packets=workload(200,30,17);chk=self.root/"complete.chk"

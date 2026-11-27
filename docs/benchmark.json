@@ -1,0 +1,193 @@
+{
+  "schema_version": 1,
+  "synthetic": true,
+  "environment": {
+    "platform": "macOS-15.7.3-arm64-arm-64bit-Mach-O",
+    "python": "3.14.2",
+    "compiler": "Apple clang version 17.0.0 (clang-1700.0.13.5)"
+  },
+  "source_sha256": "e0457f1d0a6da9489a37ea29fa067ae58ce1fb2f08f90908e67283e1fd4c8bac",
+  "timing_scope": "C++ elapsed includes capture reads, bounds/sequence checks, event decoding and staged map copies; excludes fixture generation, checkpoint serialization and output. Fresh process per repetition; no affinity or cold-cache control.",
+  "profiles": [
+    {
+      "target_active_depth": 100,
+      "max_messages_per_packet": 1,
+      "count": 20000,
+      "capture_sha256": "6b9d75f993478361def1e35117fb9879adeb5529f74ac3406dd6c57e0d5fd430",
+      "independent_reference_equal": true,
+      "samples": [
+        {
+          "session_hex": "44454d4f303030303031",
+          "next_sequence": 20001,
+          "ended": true,
+          "active_orders": 100,
+          "packets": 20001,
+          "new_messages": 20000,
+          "elapsed_seconds": 0.017849917,
+          "messages_per_second": 1120453.38922,
+          "state_fnv64": "11840793178095210386"
+        },
+        {
+          "session_hex": "44454d4f303030303031",
+          "next_sequence": 20001,
+          "ended": true,
+          "active_orders": 100,
+          "packets": 20001,
+          "new_messages": 20000,
+          "elapsed_seconds": 0.017591625,
+          "messages_per_second": 1136904.63502,
+          "state_fnv64": "11840793178095210386"
+        },
+        {
+          "session_hex": "44454d4f303030303031",
+          "next_sequence": 20001,
+          "ended": true,
+          "active_orders": 100,
+          "packets": 20001,
+          "new_messages": 20000,
+          "elapsed_seconds": 0.017228458,
+          "messages_per_second": 1160869.99777,
+          "state_fnv64": "11840793178095210386"
+        }
+      ],
+      "median_messages_per_second": 1136904.63502,
+      "minimum_messages_per_second": 1120453.38922,
+      "maximum_messages_per_second": 1160869.99777
+    },
+    {
+      "target_active_depth": 100,
+      "max_messages_per_packet": 32,
+      "count": 20000,
+      "capture_sha256": "388a8aaaca6b0fce2f3317367619557d9b8d597ed0e17a53e8dee7fef039f8ab",
+      "independent_reference_equal": true,
+      "samples": [
+        {
+          "session_hex": "44454d4f303030303031",
+          "next_sequence": 20001,
+          "ended": true,
+          "active_orders": 100,
+          "packets": 626,
+          "new_messages": 20000,
+          "elapsed_seconds": 0.009927958,
+          "messages_per_second": 2014512.95422,
+          "state_fnv64": "11840793178095210386"
+        },
+        {
+          "session_hex": "44454d4f303030303031",
+          "next_sequence": 20001,
+          "ended": true,
+          "active_orders": 100,
+          "packets": 626,
+          "new_messages": 20000,
+          "elapsed_seconds": 0.010281167,
+          "messages_per_second": 1945304.45814,
+          "state_fnv64": "11840793178095210386"
+        },
+        {
+          "session_hex": "44454d4f303030303031",
+          "next_sequence": 20001,
+          "ended": true,
+          "active_orders": 100,
+          "packets": 626,
+          "new_messages": 20000,
+          "elapsed_seconds": 0.010145,
+          "messages_per_second": 1971414.4899,
+          "state_fnv64": "11840793178095210386"
+        }
+      ],
+      "median_messages_per_second": 1971414.4899,
+      "minimum_messages_per_second": 1945304.45814,
+      "maximum_messages_per_second": 2014512.95422
+    },
+    {
+      "target_active_depth": 3000,
+      "max_messages_per_packet": 1,
+      "count": 20000,
+      "capture_sha256": "1b2db6b933eabe722f1690eb1e95cc78816f2bf0113805fce8f0c6d0af90a487",
+      "independent_reference_equal": true,
+      "samples": [
+        {
+          "session_hex": "44454d4f303030303031",
+          "next_sequence": 20001,
+          "ended": true,
+          "active_orders": 3000,
+          "packets": 20001,
+          "new_messages": 20000,
+          "elapsed_seconds": 0.126066,
+          "messages_per_second": 158647.05789,
+          "state_fnv64": "10884307199348402708"
+        },
+        {
+          "session_hex": "44454d4f303030303031",
+          "next_sequence": 20001,
+          "ended": true,
+          "active_orders": 3000,
+          "packets": 20001,
+          "new_messages": 20000,
+          "elapsed_seconds": 0.114067208,
+          "messages_per_second": 175335.228684,
+          "state_fnv64": "10884307199348402708"
+        },
+        {
+          "session_hex": "44454d4f303030303031",
+          "next_sequence": 20001,
+          "ended": true,
+          "active_orders": 3000,
+          "packets": 20001,
+          "new_messages": 20000,
+          "elapsed_seconds": 0.115398375,
+          "messages_per_second": 173312.665798,
+          "state_fnv64": "10884307199348402708"
+        }
+      ],
+      "median_messages_per_second": 173312.665798,
+      "minimum_messages_per_second": 158647.05789,
+      "maximum_messages_per_second": 175335.228684
+    },
+    {
+      "target_active_depth": 3000,
+      "max_messages_per_packet": 32,
+      "count": 20000,
+      "capture_sha256": "4b6476080af20991282e3be28ded73966528fa8efb2d5932a817395b679d0c4e",
+      "independent_reference_equal": true,
+      "samples": [
+        {
+          "session_hex": "44454d4f303030303031",
+          "next_sequence": 20001,
+          "ended": true,
+          "active_orders": 3000,
+          "packets": 626,
+          "new_messages": 20000,
+          "elapsed_seconds": 0.098118042,
+          "messages_per_second": 203836.109979,
+          "state_fnv64": "10884307199348402708"
+        },
+        {
+          "session_hex": "44454d4f303030303031",
+          "next_sequence": 20001,
+          "ended": true,
+          "active_orders": 3000,
+          "packets": 626,
+          "new_messages": 20000,
+          "elapsed_seconds": 0.098784,
+          "messages_per_second": 202461.937156,
+          "state_fnv64": "10884307199348402708"
+        },
+        {
+          "session_hex": "44454d4f303030303031",
+          "next_sequence": 20001,
+          "ended": true,
+          "active_orders": 3000,
+          "packets": 626,
+          "new_messages": 20000,
+          "elapsed_seconds": 0.101633708,
+          "messages_per_second": 196785.105981,
+          "state_fnv64": "10884307199348402708"
+        }
+      ],
+      "median_messages_per_second": 202461.937156,
+      "minimum_messages_per_second": 196785.105981,
+      "maximum_messages_per_second": 203836.109979
+    }
+  ]
+}

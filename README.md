@@ -38,14 +38,16 @@ The project-specific capture format is a four-byte big-endian datagram length fo
 
 ## Engineering tradeoffs
 
-Packet atomicity copies the active order map, so cost grows with depth and packet rate. Adds also check active locate consistency by scanning the map. This favors a small, reviewable correctness model over low-latency performance claims. Active references are checked for duplicates; previously deleted reference IDs are not retained indefinitely. No matching, trade tape, hidden liquidity, auction logic, queue positions, network transport, retransmission requester or live trading is implemented.
+Packet atomicity journals only touched order IDs. Original map nodes remain owned by the journal until commit, allowing allocation-free rollback after deletion or replacement, including an allocation failure. An optional `REPLAY_COPY_ATOMICITY` compile flag retains the simple whole-book-copy baseline. Adds still scan active orders to check locate consistency, so depth remains a cost. [Measured tradeoffs](docs/BENCHMARKS.md) are local synthetic results, not low-latency production claims. Active references are checked for duplicates; previously deleted reference IDs are not retained indefinitely. No matching, trade tape, hidden liquidity, auction logic, queue positions, network transport, retransmission requester or live trading is implemented.
 
 Prices remain integer units of 1/10,000 and visible quantities remain integer shares. Crossed books are not rejected because a reconstruction tool must not invent matching behavior during auctions. Attributed replacements preserve stock, side and MPID. Priced/non-printable executions reduce displayed quantity regardless of their tape-printing flag.
 
 ## Validation and references
 
-Tests cover all supported message types, five seeded streams against an independent Python book, truncation at every byte of an add packet, malformed lengths, gap/session/end handling, overlap deduplication, checkpoint restart/tampering, packet rollback/recovery, active-order bounds and malformed-packet smoke cases. Sanitizers run the same suite. These are bounded regression checks, not exhaustive fuzzing or exchange certification.
+Tests cover all supported message types, five seeded streams against an independent Python book, truncation at every byte of an add packet, malformed lengths, gap/session/end handling, overlap deduplication, checkpoint restart/tampering, packet rollback/recovery, injected allocation failures across delete/replace/reference reuse, active-order bounds and malformed-packet smoke cases. Sanitizers run the same suite. These are bounded regression checks, not exhaustive fuzzing or exchange certification.
 
 Primary protocol references: [Nasdaq TotalView-ITCH 5.0](https://www.nasdaqtrader.com/content/technicalsupport/specifications/dataproducts/NQTVITCHSpecification_5.0.pdf) and [MoldUDP64](https://www.nasdaqtrader.com/content/technicalsupport/specifications/dataproducts/moldudp64.pdf). Nasdaq owns its protocol documentation and licensed market data. No upstream implementation was copied. Original code is MIT licensed.
 
-See [scope](PROJECT_SCOPE.md). Repeated workload evidence and portfolio notes are included under `docs/` as each measured release is completed.
+See [scope](PROJECT_SCOPE.md), [transaction design](docs/TRANSACTIONS.md), [repeatable benchmarks](docs/BENCHMARKS.md), and [portfolio notes](docs/PORTFOLIO.md).
+
+![Measured replay throughput](docs/assets/replay-benchmark.png)

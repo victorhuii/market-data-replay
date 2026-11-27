@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <unordered_set>
 
 namespace replay {
 using Bytes=std::span<const uint8_t>;
@@ -53,8 +54,8 @@ struct State {
         if(type=='C')require((b[31]=='Y'||b[31]=='N') && be(b,32,4)>0 && be(b,32,4)<=2000000000ULL,"invalid priced execution");
         found->second.quantity-=static_cast<uint32_t>(quantity);if(found->second.quantity==0)orders.erase(found);
     }
-    // The book copy is intentional: a rejected packet cannot leave partial state.
-    // Complexity is O(active orders + event work) per packet, not a low-latency claim.
+    // Packet commit is atomic. The optional copy implementation is retained as
+    // a correctness/performance baseline; default journaling touches only IDs used.
     size_t apply(Bytes packet){
         require(packet.size()>=20 && packet.size()<=65507,"invalid MoldUDP64 datagram size");auto incoming=text(packet.first(10));require(printable(incoming),"invalid session bytes");auto sequence=be(packet,10,8),count=be(packet,18,2);require(sequence>0,"zero sequence");
         require(session.empty() || incoming==session,"session mismatch");
@@ -67,9 +68,41 @@ struct State {
         require(offset==packet.size(),"datagram trailing bytes");
         if(end_sequence<=next)return 0; // Well-framed complete retransmission.
         require(!ended,"session ended");require(sequence<=next,"forward sequence gap");
+#ifdef REPLAY_COPY_ATOMICITY
         State staged=*this;staged.session=incoming;size_t applied=0;
         for(size_t i=static_cast<size_t>(next-sequence);i<events.size();++i){staged.event(events[i]);++applied;}
         staged.next=end_sequence;*this=std::move(staged);return applied;
+#else
+        using Node=decltype(orders)::node_type;
+        struct Undo {uint64_t id;Node original;};
+        std::vector<Undo> journal;journal.reserve(events.size()*2);
+        std::unordered_set<uint64_t> touched;touched.reserve(events.size()*2);
+        auto previous_timestamp=max_timestamp;
+        auto touch=[&](uint64_t id){
+            if(!touched.insert(id).second)return;
+            auto found=orders.find(id);
+            if(found==orders.end()){journal.push_back(Undo{id,Node{}});return;}
+            // Allocate the working copy before extracting the original node. The
+            // original node remains owned by the journal, so rollback can restore
+            // deleted/replaced orders without allocating, even after bad_alloc.
+            decltype(orders) working;working.emplace(id,found->second);
+            auto original=orders.extract(found);journal.push_back(Undo{id,std::move(original)});
+            orders.insert(working.extract(id));
+        };
+        size_t applied=0;
+        try{
+            for(size_t i=static_cast<size_t>(next-sequence);i<events.size();++i){
+                auto message=events[i];
+                if(message.size()>=19 && std::string("AFECXDU").find(static_cast<char>(message[0]))!=std::string::npos){touch(be(message,11,8));if(message[0]=='U' && message.size()>=27)touch(be(message,19,8));}
+                event(message);++applied;
+            }
+        }catch(...){
+            for(auto& undo:journal)orders.erase(undo.id);
+            for(auto& undo:journal){if(!undo.original.empty())orders.insert(std::move(undo.original));}
+            max_timestamp=previous_timestamp;throw;
+        }
+        session.swap(incoming);next=end_sequence;return applied;
+#endif
     }
     std::string body()const{
         std::ostringstream out;out<<"MDR1\n"<<hextext(session)<<' '<<next<<' '<<ended<<' '<<max_timestamp<<' '<<orders.size()<<'\n';
